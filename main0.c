@@ -1,4 +1,4 @@
-#include "stdint.h"
+#include"stdint.h"
 #include "math.h"
 #include "Define.h" // reallocate the path for Define. if necessary
 
@@ -13,7 +13,7 @@ void SystemInit(){}
 	}
 
 
-#define RED 0x02
+#define RED 0x02 
 #define BLUE 0x04
 #define GREEN 0x08
 	
@@ -66,57 +66,35 @@ void LCD_init(void){
             
 }
 }
-
-void char_to_LCD(char *data)
-{
-    int i=0;
-    while(data[i])
-    {
-        LCD_Data(data[i]);
-        LCD_Command(0x06);
-        i++;
-    }
-}
-
- 
-
-void clear()
-{
-                LCD_Command(0x01);//clear
-	
-                LCD_Command(0x80); //force crussor to begin in the first line
-	              LCD_Command(0x02);
-}
-
- 
-
-int gt100(int distance)
-{
-    if(distance>=100)return 1;
-    else return 0;
-}
-
- 
-
-double calc_distance(double x1,double x2,double y1,double y2)
-{
-    return sqrt((x2-x1)*(x2-x1) +(y2-y1)*(y2-y1));
-}
-
-
 int main()
 {
-int i;
-while(1)
-    {
-	 double distance = calc_distance(80,10,130,40);// data to check calc_distance function. 
-	  int i;
+    double total_distance= 0 ;
+    double distance = calc_distance(80,10,130,40);// data to check calc_distance function. 
+    int i;
     char data[]="distance is 100m";
     init_F();
     LCD_init();
-	 clear() ;//clear and start from the beginning
-   	                 char_to_LCD(data);	// dummy numbers to check the function calculating distance
-								
-   }
+	  
+    while(1)
+    {
+	  for( i=0; i<10;i++)
+	        {
+	        delay();
+         	}		 
+			distance = calc_distance(5,2,10,4); // dummy data instead of GPS coordinates.
+			total_distance+= distance;
+	        if(gt100(total_distance)) 
+		{ 
+                     GPIO_PORTF_DATA_R = RED;  // Red led is on when the distance exceeds 100m.
+		     clear() ;//clear and start from the beginning
+   	              char_to_LCD(data);	// dummy numbers to check the function calculating distance
+		       break; // exit while loop.
+		}
+		else{
+                    GPIO_PORTF_DATA_R = 0x11;
+		}
+                 
+                
+    }
 }
  

@@ -65,6 +65,44 @@ void LCD_init(void){
             
 }
 }
+
+void char_to_LCD(char *data)
+{
+    int i=0;
+    while(data[i])
+    {
+        LCD_Data(data[i]);
+        LCD_Command(0x06);
+        i++;
+    }
+}
+
+ 
+
+void clear()
+{
+                LCD_Command(0x01);//clear
+	
+                LCD_Command(0x80); //force crussor to begin in the first line
+	              LCD_Command(0x02);
+}
+
+ 
+
+int gt100(int distance)
+{
+    if(distance>=100)return 1;
+    else return 0;
+}
+
+ 
+
+double calc_distance(double x1,double x2,double y1,double y2)
+{
+    return sqrt((x2-x1)*(x2-x1) +(y2-y1)*(y2-y1));
+}
+
+
 int main()
 {
 int i;

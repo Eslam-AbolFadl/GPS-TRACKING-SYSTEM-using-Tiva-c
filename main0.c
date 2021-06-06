@@ -70,22 +70,13 @@ int main()
 int i;
 while(1)
     {
-	         if( (GPIO_PORTF_DATA_R&0x11) == 0)
-        {
-            GPIO_PORTF_DATA_R = GREEN;
-        }
-        else if( (GPIO_PORTF_DATA_R & 0x01) == 0)
-        {
-            GPIO_PORTF_DATA_R = RED;
-        }
-        else if( (GPIO_PORTF_DATA_R & 0x10) == 0)
-        {
-            GPIO_PORTF_DATA_R = BLUE;
-        }
-                else
-                {
-                    GPIO_PORTF_DATA_R = 0x11;
-                }
+	 double distance = calc_distance(80,10,130,40);// data to check calc_distance function. 
+	  int i;
+    char data[]="distance is 100m";
+    init_F();
+    LCD_init();
+	 clear() ;//clear and start from the beginning
+   	                 char_to_LCD(data);	// dummy numbers to check the function calculating distance
 								
    }
 }

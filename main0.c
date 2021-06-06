@@ -3,7 +3,13 @@
 
 void SystemInit(){}
 
- 
+//delay
+ void delay(void){
+  unsigned long volatile time;
+  time = 145448;  // 0.1sec
+  while(time){
+ 		time--; }
+	}
 
 
 #define RED 0x02
@@ -11,12 +17,7 @@ void SystemInit(){}
 #define GREEN 0x08
 	
 
-	void delay(void){
-  unsigned long volatile time;
-  time = 145448;  // 0.1sec
-  while(time){
- 		time--; }
-	}
+	
 	//Port F configuration	
 void init_F(void){
       uint32_t delay ;

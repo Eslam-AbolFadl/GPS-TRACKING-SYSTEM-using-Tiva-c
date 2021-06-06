@@ -32,8 +32,6 @@ void init_F(void){
       GPIO_PORTF_PCTL_R = 0 ;   
       GPIO_PORTF_PUR_R =0x11;
 }
-
-
 		
 	//LCD Configuration
 void LCD_init(void){
@@ -66,29 +64,29 @@ void LCD_init(void){
             LCD_Command(0x0F); //to turn the screen on
             
 }
-
- // LCD_Command
-void LCD_Command(char cmd)
-{
-      GPIO_PORTA_DATA_R=0; // put control signals (RS-->5th , RW-->6th , E-->7th) , RS=0 to command
-      GPIO_PORTB_DATA_R=cmd; // Put the Command in Port B
-      
-        GPIO_PORTA_DATA_R|=0x80; // Put 1 to 7th ,, E-->7
-        delay();
-        GPIO_PORTA_DATA_R|=0; // Put 0 to 7th ,, E-->0
 }
-
-//LCD_Data
-
-void LCD_Data(char data)
+int main()
 {
-      GPIO_PORTA_DATA_R=0x20; // Put 1 to 5th ,, RS=1 , RW=0(to write) , E=0
-      GPIO_PORTB_DATA_R=data; // Put the Command in Port B
-      
-        GPIO_PORTA_DATA_R|=0x80; // Put 1 to 7th ,, E=1
-        delay();
-        GPIO_PORTA_DATA_R|=0; // Put 0 to 7th ,, E=0
-}
-
+int i;
+while(1)
+    {
+	         if( (GPIO_PORTF_DATA_R&0x11) == 0)
+        {
+            GPIO_PORTF_DATA_R = GREEN;
+        }
+        else if( (GPIO_PORTF_DATA_R & 0x01) == 0)
+        {
+            GPIO_PORTF_DATA_R = RED;
+        }
+        else if( (GPIO_PORTF_DATA_R & 0x10) == 0)
+        {
+            GPIO_PORTF_DATA_R = BLUE;
+        }
+                else
+                {
+                    GPIO_PORTF_DATA_R = 0x11;
+                }
+								
+   }
 }
  

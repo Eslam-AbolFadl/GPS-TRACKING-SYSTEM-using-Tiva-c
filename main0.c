@@ -32,6 +32,18 @@ void init_F(void){
       GPIO_PORTF_PCTL_R = 0 ;   
       GPIO_PORTF_PUR_R =0x11;
 }
+ // LCD_Command
+void LCD_Command(char cmd)
+{
+      GPIO_PORTA_DATA_R=0; // put control signals (RS-->5th , RW-->6th , E-->7th) , RS=0 to command
+      GPIO_PORTB_DATA_R=cmd; // Put the Command in Port B
+      
+        GPIO_PORTA_DATA_R|=0x80; // Put 1 to 7th ,, E-->7
+        delay();
+        GPIO_PORTA_DATA_R|=0; // Put 0 to 7th ,, E-->0
+}
+
+
 		
 	//LCD Configuration
 void LCD_init(void){
@@ -64,5 +76,6 @@ void LCD_init(void){
             LCD_Command(0x0F); //to turn the screen on
             
 }
+
 }
  

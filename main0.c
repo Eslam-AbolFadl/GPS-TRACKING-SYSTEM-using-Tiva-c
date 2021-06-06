@@ -10,6 +10,14 @@ void SystemInit(){}
 #define BLUE 0x04
 #define GREEN 0x08
 	
+
+	void delay(void){
+  unsigned long volatile time;
+  time = 145448;  // 0.1sec
+  while(time){
+ 		time--; }
+	}
+	//Port F configuration	
 void init_F(void){
       uint32_t delay ;
       SYSCTL_RCGCGPIO_R |= 0x00000020 ;
@@ -23,12 +31,8 @@ void init_F(void){
       GPIO_PORTF_PCTL_R = 0 ;   
       GPIO_PORTF_PUR_R =0x11;
 }
-	void delay(void){
-  unsigned long volatile time;
-  time = 145448;  // 0.1sec
-  while(time){
- 		time--;
-  }
+		
+	//LCD Configuration
 void LCD_init(void){
       uint32_t delay ;
       SYSCTL_RCGCGPIO_R |= 0x00000003 ; //for Port A and Port B

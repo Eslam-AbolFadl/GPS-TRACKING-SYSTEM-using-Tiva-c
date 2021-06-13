@@ -126,6 +126,15 @@ void UART_Init(){
     GPIO_PORTC_AMSEL_R = ~0x30 ;    
 }
 
+char UART_receive (){
+   while((UART1_FR_R & 0x0010 )!= 0)
+		 ; //RXFE is 1
+    
+    return ( (char)UART1_DR_R &0xff );
+         
+     
+}
+
 int main()
 {
     double total_distance= 0 ;

@@ -82,3 +82,41 @@
 #define GPIO_PORTC_DMACTL_R     (*((volatile uint32_t *)0x40006534))
 
 //*****************************************************************************
+//------------ Systick
+#define NVIC_ST_CTRL_R          (*((volatile uint32_t *)0xE000E010))
+#define NVIC_ST_RELOAD_R        (*((volatile uint32_t *)0xE000E014))
+#define NVIC_ST_CURRENT_R       (*((volatile uint32_t *)0xE000E018))
+	
+
+
+// UART 
+#define SYSCTL_RCGCUART_R       (*((volatile uint32_t *)0x400FE618))
+#define UART1_CTL_R             (*((volatile uint32_t *)0x4000D030))
+#define UART1_IBRD_R            (*((volatile uint32_t *)0x4000D024))
+#define UART1_FBRD_R            (*((volatile uint32_t *)0x4000D028))
+#define UART1_LCRH_R            (*((volatile uint32_t *)0x4000D02C))
+
+// UART registers (UART1)
+//
+//*****************************************************************************
+#define UART1_DR_R              (*((volatile uint32_t *)0x4000D000))
+#define UART1_RSR_R             (*((volatile uint32_t *)0x4000D004))
+#define UART1_ECR_R             (*((volatile uint32_t *)0x4000D004))
+#define UART1_FR_R              (*((volatile uint32_t *)0x4000D018))
+#define UART1_ILPR_R            (*((volatile uint32_t *)0x4000D020))
+#define UART1_IBRD_R            (*((volatile uint32_t *)0x4000D024))
+#define UART1_FBRD_R            (*((volatile uint32_t *)0x4000D028))
+#define UART1_LCRH_R            (*((volatile uint32_t *)0x4000D02C))
+#define UART1_CTL_R             (*((volatile uint32_t *)0x4000D030))
+#define UART1_IFLS_R            (*((volatile uint32_t *)0x4000D034))
+#define UART1_IM_R              (*((volatile uint32_t *)0x4000D038))
+#define UART1_RIS_R             (*((volatile uint32_t *)0x4000D03C))
+#define UART1_MIS_R             (*((volatile uint32_t *)0x4000D040))
+#define UART1_ICR_R             (*((volatile uint32_t *)0x4000D044))
+#define UART1_DMACTL_R          (*((volatile uint32_t *)0x4000D048))
+#define UART1_9BITADDR_R        (*((volatile uint32_t *)0x4000D0A4))
+#define UART1_9BITAMASK_R       (*((volatile uint32_t *)0x4000D0A8))
+#define UART1_PP_R              (*((volatile uint32_t *)0x4000DFC0))
+#define UART1_CC_R              (*((volatile uint32_t *)0x4000DFC8))
+
+//*****************************

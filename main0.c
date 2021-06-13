@@ -101,6 +101,16 @@ void LCD_init(void){
             LCD_Command(0x0F); //to turn the screen on
             
 }
+
+void char_to_LCD(char *data)
+{
+    int i=0;
+    while(data[i])
+    {
+        LCD_Data(data[i]);
+        LCD_Command(0x06);
+        i++;
+    }
 }
 
 void clear()

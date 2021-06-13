@@ -133,7 +133,8 @@ int gt100(int distance)
 
 double calc_distance(double x1,double x2,double y1,double y2)
 {
-    return sqrt((x2-x1)*(x2-x1) +(y2-y1)*(y2-y1));
+    double i= sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+	 return (i*111139.9) ;
 }
 
 void UART_Init(){

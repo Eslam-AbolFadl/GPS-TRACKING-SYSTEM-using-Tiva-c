@@ -1,16 +1,32 @@
-#include"stdint.h"
+#include "stdint.h"
+#include "stdlib.h"
 #include "math.h"
-#include "Define.h" // reallocate the path for Define. if necessary
-
+#include "Define.h" 
+#include "stdio.h"
 void SystemInit(){}
 
-//delay
- void delay(void){
-  unsigned long volatile time;
-  time = 145448;  // 0.1sec
-  while(time){
- 		time--; }
-	}
+// //delay
+//  void delay(void){
+//   unsigned long volatile time;
+//   time = 145448;  // 0.1sec
+//   while(time){
+//  		time--; }
+// 	}
+
+void SysTick_Wait(uint32_t delay){
+    NVIC_ST_CTRL_R = 0; //disable SysTick
+    NVIC_ST_RELOAD_R = delay-1;
+    NVIC_ST_CURRENT_R = 0;
+    NVIC_ST_CTRL_R = 0x00000005;// enable SysTick
+    while((NVIC_ST_CTRL_R&0x00010000)==0);   // wait for flag
+}
+
+void delay( uint32_t n){
+	unsigned long i ;
+	for(i=0; i<n; i++){
+	SysTick_Wait(800000); // wait 10ms
+}}
+ 
 
 
 #define RED 0x02 
@@ -110,16 +126,141 @@ double calc_distance(double x1,double x2,double y1,double y2)
     return sqrt((x2-x1)*(x2-x1) +(y2-y1)*(y2-y1));
 }
 
-int main()
+void UART_Init(){
+    SYSCTL_RCGCUART_R |= 0x00000002 ;  //UART1
+    SYSCTL_RCGCGPIO_R |= 0x00000004 ;  // port c 
+	 
+    UART1_CTL_R &= ~0x00000001 ;       // disable UART
+    UART1_IBRD_R =  104;                     //int(80000000/(16 * 9600))       
+    UART1_FBRD_R = 11 ; 
+    UART1_LCRH_R = 0x00000070 ; // no parity , one stop
+    UART1_CTL_R |= 0x00000301 ;       // enable UART
+	 
+    GPIO_PORTC_AFSEL_R = 0x30  ;      // pc4 ,pc5 
+    GPIO_PORTC_DEN_R = 0x30  ;        // pc4 ,pc5 
+    GPIO_PORTC_PCTL_R = (GPIO_PORTC_PCTL_R & 0xff00ffff )+ 0x00220000;     // pc4 -> u1Rx   pc5 -> u1Tx    
+    GPIO_PORTC_AMSEL_R = ~0x30 ;    
+}
+
+char UART_receive (){
+   while((UART1_FR_R & 0x0010 )!= 0)
+		 ; //RXFE is 1
+    
+    return ( (char)UART1_DR_R &0xff );
+         
+     
+}
+void UART_send (uint8_t data){
+   while((UART1_FR_R & 0x0020 )!= 0); //TXFF is 1
+
+     UART1_DR_R = data  ;
+         
+}
+
+
+// x and y calculations from NMEA 
+void x_y_Calc(char *x, char *y,double *X, double *Y) 
 {
-    double total_distance= 0 ;
-    double distance = calc_distance(80,10,130,40);// data to check calc_distance function. 
-    int i;
-    char data[]="distance is 100m";
-    init_F();
-    LCD_init();
+    int i = 2; //start from the third
+    int j=0;
+    double a, b, c, d;
+    char temp[10];
+	
+    //for a 
+    temp[0] = x[0];
+    temp[1] = x[1];
+    a = atof(temp); //dd
+
+    //for c
+    temp[0] = y[0];
+    temp[1] = y[1];
+    temp[2] = y[2];
+    c = atof(temp); //ddd
+    
+    //for b
+    while (x[i] && i < 10)
+    {
+        temp[j] = x[i];
+        i++;
+        j++;
+    }
+    b = atof(temp); // mm.mmmmm
+ 
+
+    //for d
+    i = 3;  // start from the fourth number
+    j = 0;
+    while (y[i] && i < 11)
+    {
+        temp[j] = y[i];
+        i++;
+        j++;
+    }
+		
+    d = atof(temp); // mm.mmmmm
+        
+    *X = (a +( b / 60.0));
+    *Y = (c +( d / 60.0));
+}
+
+ int main(){
+	 int flag_distance =0;
+	 uint8_t i= 0; 
+	 int entry=1 ;
+	 double X_C=0 ,Y_C=0 ,X_L=0 ,Y_L=0 ;
+	 char D[16];
+	 char N[10];
+	 char E[11];
+   double total_distance= 0 ;
+   double distance = 0 ;
+	 init_F();
+	 LCD_init();
+	 UART_Init();
+	 sprintf(D,"%F",total_distance);
+			 	GPIO_PORTF_DATA_R = GREEN;
+				clear();
+        char_to_LCD(D); 
+	     delay(20);
+	while(1)
+			 {  
+				  i=sequence_detector(N, E);
+
+		 if(i==1){
+			 if(flag_distance)
+			 {
+				 X_L=X_C, Y_L=Y_C;
+		                  x_y_Calc(N , E,& X_C ,& Y_C);
+				distance= calc_distance(X_C ,X_L , Y_C,Y_L);
+				 if(distance <=15) {
+				 distance =0;
+				 X_C=X_L, Y_C=Y_L;
+				 }
+				 else
+				 {
+				total_distance+= distance;
+					 
+					 if(total_distance>=100)
+					 GPIO_PORTF_DATA_R = RED;
+					 
+				sprintf(D,"%F",total_distance);
+				clear();
+                                 char_to_LCD(D);}
+			 }
+			 else
+			 {
+				 flag_distance =1;
+		                x_y_Calc(N , E,& X_C ,& Y_C); 
+				total_distance=0;
+				sprintf(D,"%F",total_distance);
+			 	GPIO_PORTF_DATA_R = GREEN; 
+				clear();
+                              char_to_LCD(D);
+			 }
+			}
+		 }
+	 }
 	  
-    while(1)
+ /*   while(1)
     {
 	  for( i=0; i<10;i++)
 	        {
@@ -140,5 +281,5 @@ int main()
                  
                 
     }
-}
+} */
  

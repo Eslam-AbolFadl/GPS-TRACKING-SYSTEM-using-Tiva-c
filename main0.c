@@ -4,13 +4,28 @@
 
 void SystemInit(){}
 
-//delay
- void delay(void){
-  unsigned long volatile time;
-  time = 145448;  // 0.1sec
-  while(time){
- 		time--; }
-	}
+// //delay
+//  void delay(void){
+//   unsigned long volatile time;
+//   time = 145448;  // 0.1sec
+//   while(time){
+//  		time--; }
+// 	}
+
+void SysTick_Wait(uint32_t delay){
+    NVIC_ST_CTRL_R = 0; //disable SysTick
+    NVIC_ST_RELOAD_R = delay-1;
+    NVIC_ST_CURRENT_R = 0;
+    NVIC_ST_CTRL_R = 0x00000005;// enable SysTick
+    while((NVIC_ST_CTRL_R&0x00010000)==0);   // wait for flag
+}
+
+void delay( uint32_t n){
+	unsigned long i ;
+	for(i=0; i<n; i++){
+	SysTick_Wait(800000); // wait 10ms
+}}
+ 
 
 
 #define RED 0x02 

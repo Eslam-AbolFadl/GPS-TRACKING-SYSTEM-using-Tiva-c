@@ -110,29 +110,54 @@ double calc_distance(double x1,double x2,double y1,double y2)
     return sqrt((x2-x1)*(x2-x1) +(y2-y1)*(y2-y1));
 }
 
-void UART_Init(){
-    SYSCTL_RCGCUART_R |= 0x00000002 ;  //UART1
-    SYSCTL_RCGCGPIO_R |= 0x00000004 ;  // port c 
-	 
-    UART1_CTL_R &= ~0x00000001 ;       // disable UART
-    UART1_IBRD_R =  104;                     //int(80000000/(16 * 9600))       
-    UART1_FBRD_R = 11 ; 
-    UART1_LCRH_R = 0x00000070 ; // no parity , one stop
-    UART1_CTL_R |= 0x00000301 ;       // enable UART
-	 
-    GPIO_PORTC_AFSEL_R = 0x30  ;      // pc4 ,pc5 
-    GPIO_PORTC_DEN_R = 0x30  ;        // pc4 ,pc5 
-    GPIO_PORTC_PCTL_R = (GPIO_PORTC_PCTL_R & 0xff00ffff )+ 0x00220000;     // pc4 -> u1Rx   pc5 -> u1Tx    
-    GPIO_PORTC_AMSEL_R = ~0x30 ;    
-}
+// x and y (co ordinates) calculations from nmea
+void x_y_Calc(char *x, char *y,double *X, double *Y) 
+{
+    int i = 2; //start from the third
+    int j=0;
+    double a, b, c, d;
+    char temp[10];
+    //for a 
+    temp[0] = x[0];
+    temp[1] = x[1];
+    a = atof(temp); // dd
 
-char UART_receive (){
-   while((UART1_FR_R & 0x0010 )!= 0)
-		 ; //RXFE is 1
+ 
+
+    //for c
+    temp[0] = y[0];
+    temp[1] = y[1];
+    temp[2] = y[2];
+    c = atof(temp); // ddd
     
-    return ( (char)UART1_DR_R &0xff );
-         
-     
+    //for b
+    while (x[i] && i < 10)
+    {
+        temp[j] = x[i];
+        i++;
+        j++;
+    }
+    b = atof(temp); // mm.mmmm
+ 
+
+ 
+
+ 
+
+    i = 3;  // start from the fourth number
+    //for d
+    j = 0;
+    while (y[i] && i < 11)
+    {
+        temp[j] = y[i];
+        i++;
+        j++;
+    }
+		
+    d = atof(temp); // mm.mmmm
+        
+    *X = (a +( b / 60.0));
+    *Y = (c +( d / 60.0));
 }
 
 int main()

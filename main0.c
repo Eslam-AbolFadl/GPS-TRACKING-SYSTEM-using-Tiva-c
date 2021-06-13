@@ -169,11 +169,7 @@ void x_y_Calc(char *x, char *y,double *X, double *Y)
     }
     b = atof(temp); // mm.mmmmm
  
-
- 
-
- 
-
+	
     i = 3;  // start from the fourth number
     //for d
     j = 0;

@@ -140,6 +140,7 @@ void UART_send (uint8_t data){
      UART1_DR_R = data  ;
          
 }
+
 // x and y calculations from NMEA 
 void x_y_Calc(char *x, char *y,double *X, double *Y) 
 {
@@ -147,12 +148,11 @@ void x_y_Calc(char *x, char *y,double *X, double *Y)
     int j=0;
     double a, b, c, d;
     char temp[10];
+	
     //for a 
     temp[0] = x[0];
     temp[1] = x[1];
     a = atof(temp); //dd
-
- 
 
     //for c
     temp[0] = y[0];
@@ -169,9 +169,9 @@ void x_y_Calc(char *x, char *y,double *X, double *Y)
     }
     b = atof(temp); // mm.mmmmm
  
-	
-    i = 3;  // start from the fourth number
+
     //for d
+    i = 3;  // start from the fourth number
     j = 0;
     while (y[i] && i < 11)
     {

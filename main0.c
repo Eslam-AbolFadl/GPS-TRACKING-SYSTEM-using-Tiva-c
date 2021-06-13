@@ -122,8 +122,7 @@ int gt100(int distance)
 
 double calc_distance(double x1,double x2,double y1,double y2)
 {
-    double i= sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
-	 return (i*111139.9) ; //multiply by 111km
+    return sqrt((x2-x1)*(x2-x1) +(y2-y1)*(y2-y1));
 }
 
 void UART_Init(){
@@ -156,39 +155,6 @@ void UART_send (uint8_t data){
      UART1_DR_R = data  ;
          
 }
-
-int sequence_detector( char *N, char * E){
-	int i=0;
-	
-    if(UART_receive() == '$')
-	{
-	    if(UART_receive() == 'G')
-              if(UART_receive() == 'P')
-		if(UART_receive() == 'G')
-                  if(UART_receive() == 'L')
-			if(UART_receive() == 'L')
-				if(UART_receive() == ',')
-				{
-					N[0]=UART_receive();
-					if(N[0] == '3') {
-						for( i=1 ; i< 10; i++)
-  	  	                 		N[i]=UART_receive();			
-						if(UART_receive() == ',');
-                  				if(UART_receive() == 'N');
-						if(UART_receive() == ',');
-						for( i=0 ; i< 11; i++) {
-							E[i]=UART_receive();
-						}
-												
-											
-						return 1;	
-		              		}
-				}
-																
-	}
-	return 0;
-}
-
 
 
 // x and y calculations from NMEA 
@@ -235,16 +201,65 @@ void x_y_Calc(char *x, char *y,double *X, double *Y)
     *X = (a +( b / 60.0));
     *Y = (c +( d / 60.0));
 }
-int main()
-{
-    double total_distance= 0 ;
-    double distance = calc_distance(80,10,130,40);// data to check calc_distance function. 
-    int i;
-    char data[]="distance is 100m";
-    init_F();
-    LCD_init();
+
+ int main(){
+	 int flag_distance =0;
+	 uint8_t i= 0; 
+	 int entry=1 ;
+	 double X_C=0 ,Y_C=0 ,X_L=0 ,Y_L=0 ;
+	 char D[16];
+	 char N[10];
+	 char E[11];
+   double total_distance= 0 ;
+   double distance = 0 ;
+	 init_F();
+	 LCD_init();
+	 UART_Init();
+	 sprintf(D,"%F",total_distance);
+			 	GPIO_PORTF_DATA_R = GREEN;
+				clear();
+        char_to_LCD(D); 
+	     delay(20);
+	while(1)
+			 {  
+				  i=sequence_detector(N, E);
+
+		 if(i==1){
+			 if(flag_distance)
+			 {
+				 X_L=X_C, Y_L=Y_C;
+		                  x_y_Calc(N , E,& X_C ,& Y_C);
+				distance= calc_distance(X_C ,X_L , Y_C,Y_L);
+				 if(distance <=15) {
+				 distance =0;
+				 X_C=X_L, Y_C=Y_L;
+				 }
+				 else
+				 {
+				total_distance+= distance;
+					 
+					 if(total_distance>=100)
+					 GPIO_PORTF_DATA_R = RED;
+					 
+				sprintf(D,"%F",total_distance);
+				clear();
+                                 char_to_LCD(D);}
+			 }
+			 else
+			 {
+				 flag_distance =1;
+		                x_y_Calc(N , E,& X_C ,& Y_C); 
+				total_distance=0;
+				sprintf(D,"%F",total_distance);
+			 	GPIO_PORTF_DATA_R = GREEN; 
+				clear();
+                              char_to_LCD(D);
+			 }
+			}
+		 }
+	 }
 	  
-    while(1)
+ /*   while(1)
     {
 	  for( i=0; i<10;i++)
 	        {
@@ -265,5 +280,5 @@ int main()
                  
                 
     }
-}
+} */
  

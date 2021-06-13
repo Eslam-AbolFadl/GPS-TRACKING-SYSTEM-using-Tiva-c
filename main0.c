@@ -43,6 +43,16 @@ void LCD_Command(char cmd)
         delay(3);
         GPIO_PORTA_DATA_R|=0; // Put 0 to 7th ,, E-->0
 }
+
+void LCD_Data(char data)
+{
+      GPIO_PORTA_DATA_R=0x20; // Put 1 to 5th ,, RS=1 , RW=0(to write) , E=0
+      GPIO_PORTB_DATA_R=data; // Put the Command in Port B
+      
+        GPIO_PORTA_DATA_R|=0x80; // Put 1 to 7th ,, E=1
+        delay(3);
+        GPIO_PORTA_DATA_R|=0; // Put 0 to 7th ,, E=0
+}
 		
 	//LCD Configuration
 void LCD_init(void){

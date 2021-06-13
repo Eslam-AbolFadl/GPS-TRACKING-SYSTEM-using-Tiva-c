@@ -101,6 +101,16 @@ void LCD_init(void){
             LCD_Command(0x0F); //to turn the screen on
             
 }
+
+void char_to_LCD(char *data)
+{
+    int i=0;
+    while(data[i])
+    {
+        LCD_Data(data[i]);
+        LCD_Command(0x06);
+        i++;
+    }
 }
 
 void clear()
@@ -155,6 +165,38 @@ void UART_send (uint8_t data){
 
      UART1_DR_R = data  ;
          
+}
+
+int sequence_detector( char *N, char * E){
+	int i=0;
+	
+    if(UART_receive() == '$')
+	{
+	    if(UART_receive() == 'G')
+              if(UART_receive() == 'P')
+		if(UART_receive() == 'G')
+                  if(UART_receive() == 'L')
+			if(UART_receive() == 'L')
+				if(UART_receive() == ',')
+				{
+					N[0]=UART_receive();
+					if(N[0] == '3') {
+						for( i=1 ; i< 10; i++)
+  	  	                 		N[i]=UART_receive();			
+						if(UART_receive() == ',');
+                  				if(UART_receive() == 'N');
+						if(UART_receive() == ',');
+						for( i=0 ; i< 11; i++) {
+							E[i]=UART_receive();
+						}
+												
+											
+						return 1;	
+		              		}
+				}
+																
+	}
+	return 0;
 }
 
 
